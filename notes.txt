@@ -1,8 +1,0 @@
-Feature: Type checking in assignment
-Feature: Type checking in expression
-Feature: Support for structs
-Feature: Support for substraction
-Feature: Lexical error support for three error types
-Feature: Syntactical error support for three error types
-Feature: Semantic error support
-Resolve: Printing from a char array prints the ascii code, not the char
