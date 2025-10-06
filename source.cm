@@ -1,12 +1,15 @@
 char _a;
 _a = 'a' ;
-print(a);
+print(_a);
 
 bint b;
-b = 23char a;
+b = 23;
+
+char a;
 a = '\n';
 print(a);
 print(a);
+
 int c;
 c = 1 - 4 + 2;
 print(c);;
