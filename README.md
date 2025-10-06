@@ -11,7 +11,7 @@
 
 ## Run the Tests
 - Execute `make test` to compile `source.cm`, print the generated MIPS, and run it in `spim`.
-- To target individual samples (e.g., structs, chars, subtraction), run `./minicompiler tests/<file>.cm output.s` then feed `output.s` to your MIPS runtime. The available tests are arithemtic.cm, structs.cm, array.cm, arithmetic.cm.
+- To target individual samples (e.g., structs, chars, subtraction), run `./minicompiler tests/<file>.cm output.s` then feed `output.s` to your MIPS runtime. The available tests are arithemtic.cm, structs.cm, and array.cm.
 - Alter the tests to produce lexical error like typos in keywords, declared identifiers, illegal identifiers, and more to see detailed error messages with line number and suggestions. 
 
 ## Feature Highlights
