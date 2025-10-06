@@ -17,7 +17,12 @@
 ## Feature Highlights
 - `char` literals and assignments are accepted end-to-end through parsing, TAC, and codegen.
 - `struct` definitions and member access compile into correct symbol-table entries and field offsets which are assignable and accessible.
-
+- subtraction operations compile accurately  with left-to-right operator precedence, generating correct computations. 
+- improved error reporting with suggestions for typos in identifiers and keywords.
+  
 ## Demonstration Link
 - Demo video: https://drive.google.com/file/d/1hbsZdQrqea_QTi1SuDYx91Z5wz8J-Mia/view?usp=sharing
 - GitHub repository: https://github.com/DayanaGCruz/mini-compiler
+
+## GCU AI Policy Disclaimer
+- ChatGPT Codex by OpenAI was utilized as an assistant in this project. 
