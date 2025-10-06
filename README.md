@@ -1,4 +1,4 @@
-# Minimal Compiler Test Guide
+# Minimal Compiler for C-Minus
 
 ## About
  - Minimal C-Minus compiler for the C-Minus language specification in CST-405. Four new features have been added: support for char literals, structs, subtraction operations, and improved lexical and syntax error reporting. Adapted from course materials given at:
