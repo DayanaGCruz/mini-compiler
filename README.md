@@ -25,4 +25,4 @@
 - GitHub repository: https://github.com/DayanaGCruz/mini-compiler
 
 ## GCU AI Policy Disclaimer
-- ChatGPT Codex by OpenAI was utilized as an assistant in this project. 
+- ChatGPT Codex by OpenAI was utilized as an assistant in this project as allowed by the course instructor. 
