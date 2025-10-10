@@ -36,6 +36,9 @@ extern YYLTYPE yylloc;
 
 "struct"        { return KW_STRUCT; }
 
+"return"        { return KW_RETURN; }
+"void"          { return VOID; }
+
 [a-zA-Z_][a-zA-Z0-9_]* { 
     printf("Found ID\n");
     yylval.str = strdup(yytext);
@@ -86,6 +89,7 @@ extern YYLTYPE yylloc;
 "{"             { return '{'; }
 "}"             { return '}'; }
 "."             { return '.'; }
+","             { return ','; }
 
 [ \t\r]+       { }
 

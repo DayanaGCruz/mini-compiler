@@ -2,7 +2,7 @@ char _a;
 _a = 'a' ;
 print(_a);
 
-bint b;
+int b;
 b = 23;
 
 char a;
@@ -12,5 +12,5 @@ print(a);
 
 int c;
 c = 1 - 4 + 2;
-print(c);;
+print(c);
 print(b);

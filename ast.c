@@ -166,6 +166,52 @@ ASTNode *createStructAccess(char *varName, char *fieldName) {
   node->data.struct_access.fieldName = strdup(fieldName);
   return node;
 }
+
+ASTNode *createFuncDecl(char *returnType, char *name, ASTNode *params,
+                        ASTNode *body) {
+  ASTNode *node = malloc(sizeof(ASTNode));
+  node->type = NODE_FUNC_DECL;
+  node->data.func_decl.name = strdup(name);
+  node->data.func_decl.returnType = strdup(returnType);
+  node->data.func_decl.params = params;
+  node->data.func_decl.body = body;
+  return node;
+}
+ASTNode *createFuncCall(char *name, ASTNode *args) {
+  ASTNode *node = malloc(sizeof(ASTNode));
+  node->type = NODE_FUNC_CALL;
+  node->data.func_call.name = name;
+  node->data.func_call.args = args;
+  return node;
+}
+ASTNode *createParam(char *type, char *name) {
+  ASTNode *node = malloc(sizeof(ASTNode));
+  node->type = NODE_PARAM;
+  node->data.param.type = type;
+  node->data.param.name = name;
+  return node;
+}
+:qASTNode *createArgList(ASTNode *arg, ASTNode *next) {
+  ASTNode *node = malloc(sizeof(ASTNode));
+  node->type = NODE_ARG_LIST;
+  node->data.list.item = arg;
+  node->data.list.next = next;
+  return node;
+}
+ASTNode *createReturn(ASTNode *expr) {
+  ASTNode *node = malloc(sizeof(ASTNode));
+  node->type = NODE_RETURN;
+  node->data.return_expr = expr;
+  return node;
+}
+ASTNode *createFuncList(ASTNode *func, ASTNode *next) {
+  ASTNode* node  = malloc(sizeof(ASTNode));
+  node->type = NODE_FUNC_LIST;
+  node->data.list.item = func;
+  node->data.list.next = next;
+  return node;
+}
+
 /* Display the AST structure (for debugging and education) */
 void printAST(ASTNode *node, int level) {
   if (!node)
@@ -246,6 +292,10 @@ void printAST(ASTNode *node, int level) {
     printf("STRUCT ACCESS: %s.%s\n", node->data.struct_access.varName,
            node->data.struct_access.fieldName);
     break;
+    case NODE_FUNC_DECL: 
+
+
+    printf("FUNCTION DECLARATION: %s"
   default:
     break;
   }

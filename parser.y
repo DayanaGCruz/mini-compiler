@@ -46,7 +46,8 @@ ASTNode* root = NULL;          /* Root of the Abstract Syntax Tree */
 
 /* NON-TERMINAL TYPES - Define what type each grammar rule returns */
 %type <node> program stmt_list stmt decl assign expr print_stmt struct_decl
-              struct_field_list struct_field struct_var_decl struct_assign
+              struct_field_list struct_field struct_var_decl struct_assign 
+              arg_list return_stmt param param_list func_decl func_list
 %type <dataType> type
 
 /* OPERATOR PRECEDENCE AND ASSOCIATIVITY */
@@ -58,12 +59,33 @@ ASTNode* root = NULL;          /* Root of the Abstract Syntax Tree */
 
 /* PROGRAM RULE - Entry point of our grammar */
 program:
-    stmt_list { 
-        /* Action: Save the statement list as our AST root */
-        root = $1;  /* $1 refers to the first symbol (stmt_list) */
-    }
+    func_list  { 
+        $$ = $1;     }
     ;
 
+
+func_list:  
+    func_decl { $$ = $1;}
+    | func_list func_decl { $$ = createFuncList($1, $2); }
+    ;
+
+func_decl: 
+         type ID '(' param_list ')' '{' stmt_list '}' {
+          $$ = createFuncDecl($1, $2, $4, $7);
+        }
+        | type ID '(' ')' '{' stmt_list '}' {
+          $$ = createFuncDecl($1, $2, NULL, $6);
+        }
+        ;
+
+param_list: 
+    param { $$ = $1; }
+    | param_list ',' param { $$ = createParamList($1, $3); }
+    ;
+
+param: 
+     type ID { $$ = createParam($1, $2); }
+     ;
 /* STATEMENT LIST - Handles multiple statements */
 stmt_list:
     stmt { 
@@ -84,6 +106,7 @@ stmt:
     | struct_decl /* Struct type definition */
     | struct_var_decl /* Struct variable declaration */
     | struct_assign /* Struct field assignment */
+    | return_stmt
     ;
 
 /*Simple types */
@@ -91,6 +114,7 @@ stmt:
 type
     : KW_INT { $$ = TYPE_INT;  /* int */}
     | KW_CHAR { $$ = TYPE_CHAR; /* char */}
+    | KW_VOID { $$ = TYPE_VOID; /* void */}
     ;
 
 /* DECLARATION RULE - "int x;" */
@@ -149,6 +173,10 @@ struct_assign
     }
     ;
 
+arg_list: 
+    expr { $$ = $1;}
+    | arg_list ',' expr { $$ = createArgList($1, $3); }
+    ;
 /* ASSIGNMENT RULE - "x = expr;" */
 assign:
     ID '=' expr ';' { 
@@ -193,6 +221,8 @@ expr:
         $$ = createArrayAccess($1, $3);
         free($1);
     }
+    | ID '(' arg_list ')' { $$ = createFuncCall($1, $3); }
+    | ID '(' ')' { $$ = createFuncCall($1, NULL);}
     | expr '+' expr { 
         /* Addition operation - builds binary tree */
         $$ = createBinOp('+', $1, $3);  /* Left child, op, right child */
@@ -202,6 +232,11 @@ expr:
         $$ = createBinOp('-', $1, $3);
     }
     | '(' expr ')' { $$ = $2; }
+    ;
+
+return_stmt: 
+    KW_RETURN expr ';' { $$ = createReturn($2); }
+    | KW_RETURN ';' { $$ = createReturn(NULL);}
     ;
 
 /* PRINT STATEMENT - "print(expr);" */

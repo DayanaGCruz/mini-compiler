@@ -8,7 +8,7 @@
  */
 
 /* Primitive types for variables */
-typedef enum DataType { TYPE_INT, TYPE_CHAR} DataType;
+typedef enum DataType { TYPE_INT, TYPE_CHAR, TYPE_VOID } DataType;
 
 /* NODE TYPES - Different kinds of AST nodes in our language */
 typedef enum {
@@ -26,12 +26,20 @@ typedef enum {
   /* Char Node Types */
   NODE_CHAR_DECL,
   /* Struct Node Types */
-  NODE_STRUCT_DEF,        /* Struct type definition */
-  NODE_STRUCT_FIELD,      /* Field inside a struct definition */
-  NODE_STRUCT_VAR_DECL,   /* Variable declaration of a struct type */
-  NODE_STRUCT_ASSIGN,     /* Assignment to a struct field */
-  NODE_STRUCT_ACCESS      /* Accessing a struct field */
-
+  NODE_STRUCT_DEF,      /* Struct type definition */
+  NODE_STRUCT_FIELD,    /* Field inside a struct definition */
+  NODE_STRUCT_VAR_DECL, /* Variable declaration of a struct type */
+  NODE_STRUCT_ASSIGN,   /* Assignment to a struct field */
+  NODE_STRUCT_ACCESS,   /* Accessing a struct field */
+  /* Function Node Types */
+  NODE_FUNC_DECL,
+  NODE_FUNC_CALL,
+  NODE_PARAM,
+  NODE_PARAM_LIST,
+  NODE_ARG_LIST,
+  NODE_RETURN,
+  NODE_FUNC_LIST,
+  NODE_BLOCK
 } NodeType;
 
 /* AST NODE STRUCTURE
@@ -91,19 +99,19 @@ typedef struct ASTNode {
     } array_access;
 
     struct {
-      char *name;            /* Struct type name */
-      struct ASTNode *fields;/* Linked list of field nodes */
+      char *name;             /* Struct type name */
+      struct ASTNode *fields; /* Linked list of field nodes */
     } struct_def;
 
     struct {
-      char *fieldName;       /* Field identifier */
-      DataType dataType;     /* Field primitive type */
-      struct ASTNode *next;  /* Next field in definition */
+      char *fieldName;      /* Field identifier */
+      DataType dataType;    /* Field primitive type */
+      struct ASTNode *next; /* Next field in definition */
     } struct_field;
 
     struct {
-      char *structName;      /* Struct type name */
-      char *varName;         /* Variable identifier */
+      char *structName; /* Struct type name */
+      char *varName;    /* Variable identifier */
     } struct_var_decl;
 
     struct {
@@ -113,9 +121,34 @@ typedef struct ASTNode {
     } struct_assign;
 
     struct {
-      char *varName;         /* Struct variable name */
-      char *fieldName;       /* Field being accessed */
+      char *varName;   /* Struct variable name */
+      char *fieldName; /* Field being accessed */
     } struct_access;
+
+    /* Function Node Types */
+    struct {
+      char *returnType;
+      char *name;
+      struct ASTNode *params;
+      struct ASTNode *body;
+    } func_decl;
+
+    struct {
+      char *name;
+      struct ASTNode *args;
+    } func_call;
+
+    struct {
+      char *type;
+      char *name;
+    } param;
+
+    struct {
+      struct ASTNode *item;
+      struct ASTNode *next;
+    } list;
+
+    struct ASTNode *return_expr;
 
   } data;
 } ASTNode;
@@ -146,6 +179,14 @@ ASTNode *appendStructField(ASTNode *list, ASTNode *field);
 ASTNode *createStructVarDecl(char *structName, char *varName);
 ASTNode *createStructAssign(char *varName, char *fieldName, ASTNode *value);
 ASTNode *createStructAccess(char *varName, char *fieldName);
+
+ASTNode *createFuncDecl(char *returnType, char *name, ASTNode *params,
+                        ASTNode *body);
+ASTNode *createFuncCall(char *name, ASTNode *args);
+ASTNode *createParam(char *type, char *name);
+ASTNode *createArgList(ASTNode *arg, ASTNode *next);
+ASTNode *createReturn(ASTNode *expr);
+ASTNode *createFuncList(ASTNode *func, ASTNode *next);
 /* AST DISPLAY FUNCTION */
 void printAST(ASTNode *node, int level); /* Pretty-print the AST */
 
