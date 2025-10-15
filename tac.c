@@ -35,6 +35,7 @@ TACInstr *createTAC(TACOp op, char *arg1, char *arg2, char *result) {
   instr->arg1 = arg1 ? strdup(arg1) : NULL;
   instr->arg2 = arg2 ? strdup(arg2) : NULL;
   instr->result = result ? strdup(result) : NULL;
+  instr->paramCount = 0;
   instr->next = NULL;
   return instr;
 }
@@ -142,8 +143,8 @@ void generateTAC(ASTNode *node) {
   }
 
   case NODE_STRUCT_DEF: {
-    appendTAC(createTAC(TAC_STRUCT_DECL, NULL, NULL,
-                        node->data.struct_def.name));
+    appendTAC(
+        createTAC(TAC_STRUCT_DECL, NULL, NULL, node->data.struct_def.name));
     ASTNode *field = node->data.struct_def.fields;
     while (field) {
       const char *typeStr =
@@ -169,6 +170,36 @@ void generateTAC(ASTNode *node) {
     break;
   }
 
+  case NODE_FUNC_DECL:
+    appendTAC(createTAC(TAC_FUNC_BEGIN, NULL, NULL, node->data.func_decl.name));
+    appendTAC(createTAC(TAC_LABEL, NULL, NULL, node->data.func_decl.name));
+    generateTAC(node->data.func_decl.body);
+    appendTAC(createTAC(TAC_FUNC_END, NULL, NULL, node->data.func_decl.name));
+    break;
+  case NODE_FUNC_CALL: {
+    ASTNode *arg = node->data.func_call.args;
+    int paramCount = -2;
+    while (arg) {
+      char *argVal = generateTACExpr(arg->data.list.item);
+      appendTAC(createTAC(TAC_PARAM, argVal, NULL, NULL));
+      paramCount++;
+      arg = arg->data.list.next;
+    }
+
+    char *temp = newTemp();
+    TACInstr *call = createTAC(TAC_CALL, node->data.func_call.name, NULL, temp);
+    call->paramCount = paramCount;
+    appendTAC(call);
+  }
+
+  case NODE_RETURN:
+    if (node->data.return_expr) {
+      char *retVal = generateTACExpr(node->data.return_expr);
+      appendTAC(createTAC(TAC_RETURN, retVal, NULL, NULL));
+    } else {
+      appendTAC(createTAC(TAC_RETURN, NULL, NULL, NULL));
+    }
+    break;
   default:
     break;
   }
@@ -338,60 +369,63 @@ void optimizeTAC() {
     }
 
     case TAC_ARRAY_DECL:
-        /* TODO: Arrays declarations don't need optimization */
-        newInstr = createTAC(TAC_ARRAY_DECL, NULL, NULL, curr->result);
-        break;
+      /* TODO: Arrays declarations don't need optimization */
+      newInstr = createTAC(TAC_ARRAY_DECL, NULL, NULL, curr->result);
+      break;
 
     case TAC_ARRAY_ASSIGN: {
-        /* TODO: Optimize array assignments */
-        char* index = curr->arg1;
-        char* value = curr->arg2;
+      /* TODO: Optimize array assignments */
+      char *index = curr->arg1;
+      char *value = curr->arg2;
 
-        /* Look up values in propagation table */
-        for (int i = valueCount - 1; i >= 0; i--) {
+      /* Look up values in propagation table */
+      for (int i = valueCount - 1; i >= 0; i--) {
         if (strcmp(values[i].var, index) == 0) {
-    index = values[i].value;
-    break;
-}
+          index = values[i].value;
+          break;
         }
-        for (int i = valueCount - 1; i >= 0; i--) {
-if (strcmp(values[i].var, value) == 0) {
-    value = values[i].value;
-    break;
-}
+      }
+      for (int i = valueCount - 1; i >= 0; i--) {
+        if (strcmp(values[i].var, value) == 0) {
+          value = values[i].value;
+          break;
         }
+      }
 
-        newInstr = createTAC(TAC_ARRAY_ASSIGN, index, value, curr->result);
-        break;
+      newInstr = createTAC(TAC_ARRAY_ASSIGN, index, value, curr->result);
+      break;
     }
 
     case TAC_ARRAY_ACCESS: {
-        /* TODO: Optimize array access */
-        char* index = curr->arg1;
+      /* TODO: Optimize array access */
+      char *index = curr->arg1;
 
-        /* Look up index in propagation table */
-        for (int i = valueCount - 1; i >= 0; i--) {
+      /* Look up index in propagation table */
+      for (int i = valueCount - 1; i >= 0; i--) {
         if (strcmp(values[i].var, index) == 0) {
-    index = values[i].value;
-    break;
-}
+          index = values[i].value;
+          break;
         }
+      }
 
-        newInstr = createTAC(TAC_ARRAY_ACCESS, index, curr->arg2, curr->result);
-        break;
+      newInstr = createTAC(TAC_ARRAY_ACCESS, index, curr->arg2, curr->result);
+      break;
     }
 
     case TAC_STRUCT_DECL:
-        newInstr = createTAC(TAC_STRUCT_DECL, curr->arg1, curr->arg2, curr->result);
-        break;
+      newInstr =
+          createTAC(TAC_STRUCT_DECL, curr->arg1, curr->arg2, curr->result);
+      break;
 
     case TAC_STRUCT_FIELD:
-        newInstr = createTAC(TAC_STRUCT_FIELD, curr->arg1, curr->arg2, curr->result);
-        break;
+      newInstr =
+          createTAC(TAC_STRUCT_FIELD, curr->arg1, curr->arg2, curr->result);
+      break;
 
     case TAC_STRUCT_VAR_DECL:
-        newInstr = createTAC(TAC_STRUCT_VAR_DECL, curr->arg1, curr->arg2, curr->result);
-        break;
+      newInstr =
+          createTAC(TAC_STRUCT_VAR_DECL, curr->arg1, curr->arg2, curr->result);
+      break;
 
     case TAC_STRUCT_ASSIGN: {
       char *value = curr->arg1;
@@ -413,8 +447,7 @@ if (strcmp(values[i].var, value) == 0) {
       values[valueCount].value = strdup(value);
       valueCount++;
 
-      newInstr =
-          createTAC(TAC_STRUCT_ASSIGN, value, curr->arg2, curr->result);
+      newInstr = createTAC(TAC_STRUCT_ASSIGN, value, curr->arg2, curr->result);
       break;
     }
 
@@ -438,11 +471,25 @@ if (strcmp(values[i].var, value) == 0) {
         values[valueCount].value = strdup(fieldValue);
         valueCount++;
       } else {
-        newInstr = createTAC(TAC_STRUCT_ACCESS, curr->arg1, curr->arg2,
-                             curr->result);
+        newInstr =
+            createTAC(TAC_STRUCT_ACCESS, curr->arg1, curr->arg2, curr->result);
       }
 
       free(fieldKey);
+      break;
+    }
+
+    case TAC_LABEL:
+    case TAC_PARAM:
+    case TAC_RETURN:
+    case TAC_FUNC_BEGIN:
+    case TAC_FUNC_END:
+      newInstr = createTAC(curr->op, curr->arg1, curr->arg2, curr->result);
+      break;
+
+    case TAC_CALL: {
+      newInstr = createTAC(TAC_CALL, curr->arg1, curr->arg2, curr->result);
+      newInstr->paramCount = curr->paramCount;
       break;
     }
     }
@@ -517,8 +564,8 @@ void printOptimizedTAC() {
              curr->arg1);
       break;
     case TAC_STRUCT_ACCESS:
-      printf("%s = %s.%s   // Struct field access\n", curr->result,
-             curr->arg1, curr->arg2);
+      printf("%s = %s.%s   // Struct field access\n", curr->result, curr->arg1,
+             curr->arg2);
       break;
     default:
       break;

@@ -1,0 +1,20 @@
+int add(int lhs, int rhs) {
+  int sum;
+
+  sum = lhs + rhs;
+  return sum;
+}
+
+char echoChar(char input) {
+  return input;
+}
+
+void main() {
+  int total;
+  char ch;
+
+  total = add(7, 5);
+  print(total);
+
+  print(echoChar('z'));
+}

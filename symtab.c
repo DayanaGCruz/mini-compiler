@@ -11,6 +11,40 @@
 SymbolTable symtab;
 StructTable structTable;
 
+#define MAX_SCOPE_DEPTH 128
+static int scopeCountStack[MAX_SCOPE_DEPTH];
+static int scopeOffsetStack[MAX_SCOPE_DEPTH];
+static int scopeDepth = 0;
+
+static void freeSymbol(Symbol *sym) {
+  if (!sym)
+    return;
+
+  if (sym->name) {
+    free(sym->name);
+    sym->name = NULL;
+  }
+
+  if (sym->structType) {
+    free(sym->structType);
+    sym->structType = NULL;
+  }
+
+  if (sym->paramTypes) {
+    for (int i = 0; i < sym->paramCount; i++) {
+      free(sym->paramTypes[i]);
+    }
+    free(sym->paramTypes);
+    sym->paramTypes = NULL;
+  }
+
+  sym->paramCount = 0;
+  sym->isArray = 0;
+  sym->arraySize = 0;
+  sym->isChar = 0;
+  sym->isStruct = 0;
+}
+
 static int alignUp(int value, int alignment) {
   int remainder = value % alignment;
   return remainder == 0 ? value : value + alignment - remainder;
@@ -36,6 +70,7 @@ void initStructTable() {
 void initSymTab() {
   symtab.count = 0;
   symtab.nextOffset = 0;
+  scopeDepth = 0;
   initStructTable();
   printf("SYMBOL TABLE: Initialized\n");
   printSymTab();
@@ -254,8 +289,9 @@ int addStructField(char *structName, char *fieldName, DataType type) {
 int addStructVar(char *varName, const char *structName) {
   StructDef *def = getStructDef(structName);
   if (!def) {
-    printf("SYMBOL TABLE: Failed to add struct var '%s' - struct '%s' undefined\n",
-           varName, structName);
+    printf(
+        "SYMBOL TABLE: Failed to add struct var '%s' - struct '%s' undefined\n",
+        varName, structName);
     return -2;
   }
 
@@ -278,8 +314,8 @@ int addStructVar(char *varName, const char *structName) {
   symtab.nextOffset += paddedSize;
   symtab.count++;
 
-  printf("SYMBOL TABLE: Added struct var '%s' (type %s) at offset %d\n", varName,
-         structName, symtab.vars[symtab.count - 1].offset);
+  printf("SYMBOL TABLE: Added struct var '%s' (type %s) at offset %d\n",
+         varName, structName, symtab.vars[symtab.count - 1].offset);
   printSymTab();
   return symtab.vars[symtab.count - 1].offset;
 }
@@ -338,6 +374,20 @@ DataType getStructFieldType(const char *structName, const char *fieldName) {
   return TYPE_INT;
 }
 
+Symbol *lookupSymbol(char *name) {
+  Scope *scope = symtab.currentScope;
+
+  while (scope != NULL) {
+    for (int i = 0; i < scope->count; i++) {
+      if (strcmp(scope->vars[i].name, name) == 0) {
+        return &scope->vars[i]; // Found it
+      }
+    }
+    scope = scope->parent; // Try parent scope
+  }
+  return NULL; // Not found in any scope
+}
+
 void printSymTab() {
   printf("\n=== SYMBOL TABLE STATE ===\n");
   printf("Count: %d, Next Offset: %d\n", symtab.count, symtab.nextOffset);
@@ -379,4 +429,31 @@ void printStructTable() {
     }
   }
   printf("==========================\n\n");
+}
+
+void enterScope() {
+  if (scopeDepth >= MAX_SCOPE_DEPTH) {
+    fprintf(stderr, "SYMBOL TABLE: Scope depth limit reached\n");
+    exit(1);
+  }
+
+  scopeCountStack[scopeDepth] = symtab.count;
+  scopeOffsetStack[scopeDepth] = symtab.nextOffset;
+  scopeDepth++;
+}
+
+void exitScope() {
+  if (scopeDepth == 0)
+    return;
+
+  scopeDepth--;
+  int targetCount = scopeCountStack[scopeDepth];
+  int targetOffset = scopeOffsetStack[scopeDepth];
+
+  while (symtab.count > targetCount) {
+    symtab.count--;
+    freeSymbol(&symtab.vars[symtab.count]);
+  }
+
+  symtab.nextOffset = targetOffset;
 }

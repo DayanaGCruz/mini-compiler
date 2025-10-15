@@ -7,6 +7,19 @@
 #include <stdlib.h>
 #include <string.h>
 
+static const char *dataTypeToString(DataType type) {
+  switch (type) {
+  case TYPE_INT:
+    return "int";
+  case TYPE_CHAR:
+    return "char";
+  case TYPE_VOID:
+    return "void";
+  default:
+    return "unknown";
+  }
+}
+
 /* Create a number literal node */
 ASTNode *createNum(int value) {
   ASTNode *node = malloc(sizeof(ASTNode));
@@ -167,12 +180,12 @@ ASTNode *createStructAccess(char *varName, char *fieldName) {
   return node;
 }
 
-ASTNode *createFuncDecl(char *returnType, char *name, ASTNode *params,
+ASTNode *createFuncDecl(DataType returnType, char *name, ASTNode *params,
                         ASTNode *body) {
   ASTNode *node = malloc(sizeof(ASTNode));
   node->type = NODE_FUNC_DECL;
   node->data.func_decl.name = strdup(name);
-  node->data.func_decl.returnType = strdup(returnType);
+  node->data.func_decl.returnType = returnType;
   node->data.func_decl.params = params;
   node->data.func_decl.body = body;
   return node;
@@ -184,14 +197,21 @@ ASTNode *createFuncCall(char *name, ASTNode *args) {
   node->data.func_call.args = args;
   return node;
 }
-ASTNode *createParam(char *type, char *name) {
+ASTNode *createParam(DataType type, char *name) {
   ASTNode *node = malloc(sizeof(ASTNode));
   node->type = NODE_PARAM;
   node->data.param.type = type;
   node->data.param.name = name;
   return node;
 }
-:qASTNode *createArgList(ASTNode *arg, ASTNode *next) {
+ASTNode *createParamList(ASTNode *param, ASTNode *next) {
+  ASTNode *node = malloc(sizeof(ASTNode));
+  node->type = NODE_PARAM_LIST;
+  node->data.list.item = param;
+  node->data.list.next = next;
+  return node;
+}
+ASTNode *createArgList(ASTNode *arg, ASTNode *next) {
   ASTNode *node = malloc(sizeof(ASTNode));
   node->type = NODE_ARG_LIST;
   node->data.list.item = arg;
@@ -205,7 +225,7 @@ ASTNode *createReturn(ASTNode *expr) {
   return node;
 }
 ASTNode *createFuncList(ASTNode *func, ASTNode *next) {
-  ASTNode* node  = malloc(sizeof(ASTNode));
+  ASTNode *node = malloc(sizeof(ASTNode));
   node->type = NODE_FUNC_LIST;
   node->data.list.item = func;
   node->data.list.next = next;
@@ -292,10 +312,38 @@ void printAST(ASTNode *node, int level) {
     printf("STRUCT ACCESS: %s.%s\n", node->data.struct_access.varName,
            node->data.struct_access.fieldName);
     break;
-    case NODE_FUNC_DECL: 
-
-
-    printf("FUNCTION DECLARATION: %s"
+  case NODE_FUNC_DECL:
+    printf("FUNC DECL: %s RETURN: %s\n", node->data.func_decl.name,
+           dataTypeToString(node->data.func_decl.returnType));
+    printAST(node->data.func_decl.params, level + 1);
+    printAST(node->data.func_decl.body, level + 1);
+    break;
+  case NODE_FUNC_CALL:
+    printf("FUNC_CALL: %s\n", node->data.func_call.name);
+    printAST(node->data.func_call.args, level + 1);
+    break;
+  case NODE_FUNC_LIST:
+    printAST(node->data.list.item, level);
+    printAST(node->data.list.next, level);
+    break;
+  case NODE_BLOCK:
+    break;
+  case NODE_RETURN:
+    printAST(node->data.return_expr, level + 1);
+    break;
+  case NODE_ARG_LIST:
+    printAST(node->data.list.item, level);
+    printAST(node->data.list.next, level);
+    break;
+  case NODE_PARAM_LIST:
+    printAST(node->data.list.item, level);
+    printAST(node->data.list.next, level);
+    break;
+  case NODE_PARAM:
+    printf("FUNCTION PARAMETER: %s %s",
+           dataTypeToString(node->data.param.type),
+           node->data.param.name);
+    break;
   default:
     break;
   }

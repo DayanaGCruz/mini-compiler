@@ -127,7 +127,7 @@ typedef struct ASTNode {
 
     /* Function Node Types */
     struct {
-      char *returnType;
+      DataType returnType;
       char *name;
       struct ASTNode *params;
       struct ASTNode *body;
@@ -139,7 +139,7 @@ typedef struct ASTNode {
     } func_call;
 
     struct {
-      char *type;
+      DataType type;
       char *name;
     } param;
 
@@ -180,10 +180,11 @@ ASTNode *createStructVarDecl(char *structName, char *varName);
 ASTNode *createStructAssign(char *varName, char *fieldName, ASTNode *value);
 ASTNode *createStructAccess(char *varName, char *fieldName);
 
-ASTNode *createFuncDecl(char *returnType, char *name, ASTNode *params,
+ASTNode *createFuncDecl(DataType returnType, char *name, ASTNode *params,
                         ASTNode *body);
 ASTNode *createFuncCall(char *name, ASTNode *args);
-ASTNode *createParam(char *type, char *name);
+ASTNode *createParam(DataType type, char *name);
+ASTNode *createParamList(ASTNode *param, ASTNode *next);
 ASTNode *createArgList(ASTNode *arg, ASTNode *next);
 ASTNode *createReturn(ASTNode *expr);
 ASTNode *createFuncList(ASTNode *func, ASTNode *next);

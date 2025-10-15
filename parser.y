@@ -42,7 +42,7 @@ ASTNode* root = NULL;          /* Root of the Abstract Syntax Tree */
 
 /* Number token carries an integer value */
 %token <str> ID         /* Identifier token carries a string */
-%token KW_INT KW_PRINT KW_CHAR KW_STRUCT        /* Keywords have no semantic value */
+%token KW_INT KW_PRINT KW_CHAR KW_STRUCT KW_VOID KW_RETURN     /* Keywords have no semantic value */
 
 /* NON-TERMINAL TYPES - Define what type each grammar rule returns */
 %type <node> program stmt_list stmt decl assign expr print_stmt struct_decl
@@ -60,6 +60,7 @@ ASTNode* root = NULL;          /* Root of the Abstract Syntax Tree */
 /* PROGRAM RULE - Entry point of our grammar */
 program:
     func_list  { 
+        root = $1;
         $$ = $1;     }
     ;
 
@@ -70,11 +71,13 @@ func_list:
     ;
 
 func_decl: 
-         type ID '(' param_list ')' '{' stmt_list '}' {
-          $$ = createFuncDecl($1, $2, $4, $7);
+         type ID '(' { enterIdentifierScope(); } param_list ')' '{' stmt_list '}' {
+          exitIdentifierScope();
+          $$ = createFuncDecl($1, $2, $5, $8);
         }
-        | type ID '(' ')' '{' stmt_list '}' {
-          $$ = createFuncDecl($1, $2, NULL, $6);
+        | type ID '(' { enterIdentifierScope(); } ')' '{' stmt_list '}' {
+          exitIdentifierScope();
+          $$ = createFuncDecl($1, $2, NULL, $7);
         }
         ;
 
@@ -84,7 +87,10 @@ param_list:
     ;
 
 param: 
-     type ID { $$ = createParam($1, $2); }
+     type ID {
+       declareIdentifier($2, @2.first_line);
+       $$ = createParam($1, $2);
+     }
      ;
 /* STATEMENT LIST - Handles multiple statements */
 stmt_list:

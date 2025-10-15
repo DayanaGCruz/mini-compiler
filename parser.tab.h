@@ -66,7 +66,9 @@ extern int yydebug;
     KW_INT = 261,                  /* KW_INT  */
     KW_PRINT = 262,                /* KW_PRINT  */
     KW_CHAR = 263,                 /* KW_CHAR  */
-    KW_STRUCT = 264                /* KW_STRUCT  */
+    KW_STRUCT = 264,               /* KW_STRUCT  */
+    KW_VOID = 265,                 /* KW_VOID  */
+    KW_RETURN = 266                /* KW_RETURN  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -82,7 +84,7 @@ union YYSTYPE
     struct ASTNode* node;   /* For AST nodes */
     DataType dataType;      /* For data type flag on identifiers and arrays */ 
 
-#line 86 "parser.tab.h"
+#line 88 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

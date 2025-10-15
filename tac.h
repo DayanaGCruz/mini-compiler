@@ -24,7 +24,14 @@ typedef enum {
   TAC_STRUCT_FIELD,
   TAC_STRUCT_VAR_DECL,
   TAC_STRUCT_ASSIGN,
-  TAC_STRUCT_ACCESS
+  TAC_STRUCT_ACCESS,
+
+  TAC_LABEL, /* Function entry pointL LABEL func_name */
+  TAC_PARAM, 
+  TAC_CALL, 
+  TAC_RETURN, 
+  TAC_FUNC_BEGIN,
+  TAC_FUNC_END
 } TACOp;
 
 /* TAC INSTRUCTION STRUCTURE */
@@ -33,6 +40,7 @@ typedef struct TACInstr {
   char *arg1;            /* First operand (if needed) */
   char *arg2;            /* Second operand (for binary ops) */
   char *result;          /* Result/destination */
+  int paramCount; /* For CALL Instr */
   struct TACInstr *next; /* Linked list pointer */
 } TACInstr;
 

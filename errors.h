@@ -24,6 +24,9 @@ int fetchKeywordSuggestion(int line, const char **identifier,
                            const char **keyword);
 void clearKeywordSuggestion(void);
 
+void enterIdentifierScope(void);
+void exitIdentifierScope(void);
+
 int getErrorCount(void);
 
 #endif

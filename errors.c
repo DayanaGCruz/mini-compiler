@@ -18,6 +18,10 @@ static int errorCount = 0;
 
 static const char *keywordList[] = {"int", "char", "print", "struct", NULL};
 
+#define MAX_SCOPE_DEPTH 128
+static int scopeMarkers[MAX_SCOPE_DEPTH];
+static int scopeDepth = 0;
+
 typedef struct {
   char *identifier;
   const char *keyword;
@@ -61,6 +65,7 @@ void resetErrorState(void) {
   identifierCount = 0;
   structTypeCount = 0;
   errorCount = 0;
+  scopeDepth = 0;
   resetPendingKeyword();
 }
 
@@ -291,3 +296,23 @@ int fetchKeywordSuggestion(int line, const char **identifier,
 }
 
 void clearKeywordSuggestion(void) { resetPendingKeyword(); }
+
+void enterIdentifierScope(void) {
+  if (scopeDepth >= MAX_SCOPE_DEPTH) {
+    return;
+  }
+  scopeMarkers[scopeDepth++] = identifierCount;
+}
+
+void exitIdentifierScope(void) {
+  if (scopeDepth == 0)
+    return;
+
+  int marker = scopeMarkers[--scopeDepth];
+  while (identifierCount > marker) {
+    identifierCount--;
+    free(identifiers[identifierCount].name);
+    identifiers[identifierCount].name = NULL;
+    identifiers[identifierCount].line = 0;
+  }
+}

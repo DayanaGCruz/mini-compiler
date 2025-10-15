@@ -19,10 +19,20 @@ typedef struct {
   int offset; /* Stack offset in bytes (for MIPS stack frame) */
   int isArray;
   int arraySize;
-  int isChar;    /* 1 if char, else 0 (int)*/
-  int isStruct;  /* 1 if struct variable */
-  char *structType; /* Struct type name if applicable */
+  int isChar;        /* 1 if char, else 0 (int)*/
+  int isStruct;      /* 1 if struct variable */
+  char *structType;  /* Struct type name if applicable */
+  int isFunction;    /* 1 if function, 0 if variable */
+  int paramCount;    /* Number of parameters (if function) */
+  char **paramTypes; /* Array of parameter types */
 } Symbol;
+
+typedef struct Scope {
+  Symbol vars[MAX_VARS];
+  int count;
+  int nextOffset;
+  struct Scope *parent;
+} Scope;
 
 typedef struct {
   char *name;
@@ -47,6 +57,8 @@ typedef struct {
   Symbol vars[MAX_VARS]; /* Array of all variables */
   int count;             /* Number of variables declared */
   int nextOffset;        /* Next available stack offset */
+  Scope *currentScope;
+  Scope *globalScope;
 } SymbolTable;
 
 /* SYMBOL TABLE OPERATIONS */
@@ -73,6 +85,14 @@ const char *getStructTypeName(const char *varName);
 int getStructFieldOffset(const char *structName, const char *fieldName);
 DataType getStructFieldType(const char *structName, const char *fieldName);
 void printSymTab(); /* Print current symbol table contents for tracing */
+
+void enterScope();
+void exitScope();
+int addFunction(char *name, char *returnType, char **paramTypes,
+                int paramCount);
+int addParameter(char *name, char *type);
+Symbol *lookupSymbol(char *name); /*Check current & global scope */
+int isInCurrentScope(char *name); /* Check current scope */
 
 extern SymbolTable symtab;
 extern StructTable structTable;
