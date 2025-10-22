@@ -10,16 +10,18 @@
 - Build once with `make` from the project root; the binary `minicompiler` is produced.
 
 ## Run the Tests
-- Execute `make test` to compile `source.cm`, print the generated MIPS, and run it in `spim`.
-- To target individual samples (e.g., structs, chars, subtraction), run `./minicompiler tests/<file>.cm output.s` then feed `output.s` to your MIPS runtime. The available tests are arithemtic.cm, struct.cm, and array.cm.
+- Execute `make test` to compile all tests, print the generated MIPS, and run it in `spim`.
+- To target individual samples (e.g., structs, chars, functions artihmetic), run `./minicompiler tests/<file>.cm output.s` then feed `output.s` to your MIPS runtime. The available tests are under the tests folder <test>.cm. 
 - Alter the tests to produce lexical error like typos in keywords, declared identifiers, illegal identifiers, and more to see detailed error messages with line number and suggestions. 
 
 ## Feature Highlights
 - `char` literals and assignments are accepted end-to-end through parsing, TAC, and codegen.
 - `struct` definitions and member access compile into correct symbol-table entries and field offsets which are assignable and accessible.
-- subtraction operations compile accurately  with left-to-right operator precedence, generating correct computations. 
+- Arithmetic operations compile accurately  with left-to-right operator precedence, generating correct computations. 
 - improved error reporting with suggestions for typos in identifiers and keywords.
-  
+- Support for functions with scope management
+- Support for arrays
+
 ## Demonstration Link
 - Demo video: https://drive.google.com/file/d/1hbsZdQrqea_QTi1SuDYx91Z5wz8J-Mia/view?usp=sharing
 - GitHub repository: https://github.com/DayanaGCruz/mini-compiler
