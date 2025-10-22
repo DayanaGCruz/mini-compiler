@@ -1,0 +1,14 @@
+void main() {
+  float samples[3];
+  float total;
+  int idx;
+
+  samples[0] = 1.25;
+  samples[1] = 2.50;
+  idx = 2;
+  samples[idx] = samples[0] + samples[1];
+  total = samples[idx] * 2.0;
+
+  print(samples[idx]);
+  print(total);
+}

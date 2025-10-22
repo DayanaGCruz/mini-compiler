@@ -32,6 +32,7 @@ ASTNode* root = NULL;          /* Root of the Abstract Syntax Tree */
  */
 %union {
     int num;                /* For integer literals & char literal codepoints */
+    double fnum;            /* For floating-point literals */
     char* str;              /* For identifiers */
     struct ASTNode* node;   /* For AST nodes */
     DataType dataType;      /* For data type flag on identifiers and arrays */ 
@@ -39,10 +40,11 @@ ASTNode* root = NULL;          /* Root of the Abstract Syntax Tree */
 
 /* TOKEN DECLARATIONS with their semantic value types */
 %token <num> LITERAL_NUM LITERAL_CHAR
+%token <fnum> LITERAL_FLOAT
 
 /* Number token carries an integer value */
 %token <str> ID         /* Identifier token carries a string */
-%token KW_INT KW_PRINT KW_CHAR KW_STRUCT KW_VOID KW_RETURN     /* Keywords have no semantic value */
+%token KW_INT KW_PRINT KW_CHAR KW_FLOAT KW_STRUCT KW_VOID KW_RETURN     /* Keywords have no semantic value */
 
 /* NON-TERMINAL TYPES - Define what type each grammar rule returns */
 %type <node> program stmt_list stmt decl assign expr print_stmt struct_decl
@@ -52,6 +54,7 @@ ASTNode* root = NULL;          /* Root of the Abstract Syntax Tree */
 
 /* OPERATOR PRECEDENCE AND ASSOCIATIVITY */
 %left '+' '-'  /* Addition and subtraction are left-associative */
+%left '*' '/'  /* Multiplication and division */
 
 %%
 
@@ -120,6 +123,7 @@ stmt:
 type
     : KW_INT { $$ = TYPE_INT;  /* int */}
     | KW_CHAR { $$ = TYPE_CHAR; /* char */}
+    | KW_FLOAT { $$ = TYPE_FLOAT; /* float */}
     | KW_VOID { $$ = TYPE_VOID; /* void */}
     ;
 
@@ -127,10 +131,12 @@ type
 decl
     : type ID ';' { 
       declareIdentifier($2, @2.first_line);
-      if($1 == TYPE_INT) { /* int */
+      if($1 == TYPE_INT) {
           $$ = createDecl($2);
-      }  else {       /* char */
+      } else if ($1 == TYPE_CHAR) {
         $$ = createCharDecl($2);
+      } else {
+        $$ = createFloatDecl($2);
       }
     }
     | type ID '[' LITERAL_NUM ']' ';' {
@@ -204,6 +210,9 @@ expr:
         /* Literal number */
         $$ = createNum($1);  /* Create leaf node with number value */
     }
+    | LITERAL_FLOAT {
+        $$ = createFloat($1);
+    }
     | LITERAL_CHAR {
         /* Literal char */
         $$ = createNum($1);
@@ -236,6 +245,12 @@ expr:
     | expr '-' expr {
         /* Subtraction operation - builds binary tree */
         $$ = createBinOp('-', $1, $3);
+    }
+    | expr '*' expr {
+        $$ = createBinOp('*', $1, $3);
+    }
+    | expr '/' expr {
+        $$ = createBinOp('/', $1, $3);
     }
     | '(' expr ')' { $$ = $2; }
     ;

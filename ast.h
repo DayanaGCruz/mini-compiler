@@ -8,11 +8,12 @@
  */
 
 /* Primitive types for variables */
-typedef enum DataType { TYPE_INT, TYPE_CHAR, TYPE_VOID } DataType;
+typedef enum DataType { TYPE_INT, TYPE_CHAR, TYPE_FLOAT, TYPE_VOID } DataType;
 
 /* NODE TYPES - Different kinds of AST nodes in our language */
 typedef enum {
   NODE_NUM,       /* Numeric literal (e.g., 42) */
+  NODE_FLOAT,     /* Float literal (e.g., 3.14) */
   NODE_VAR,       /* Variable reference (e.g., x) */
   NODE_BINOP,     /* Binary operation (e.g., x + y) */
   NODE_DECL,      /* Variable declaration (e.g., int x) */
@@ -25,6 +26,7 @@ typedef enum {
   NODE_ARRAY_ACCESS, /* Array access (e.g., x[5]) */
   /* Char Node Types */
   NODE_CHAR_DECL,
+  NODE_FLOAT_DECL,
   /* Struct Node Types */
   NODE_STRUCT_DEF,      /* Struct type definition */
   NODE_STRUCT_FIELD,    /* Field inside a struct definition */
@@ -53,6 +55,7 @@ typedef struct ASTNode {
   union {
     /* Literal number value (NODE_NUM) */
     int num;
+    double fnum;
 
     /* Variable or declaration name (NODE_VAR, NODE_DECL, NODE_CHAR_DECL) */
     char *name;
@@ -158,6 +161,7 @@ typedef struct ASTNode {
  */
 ASTNode *createNum(int value);  /* Create number node */
 ASTNode *createVar(char *name); /* Create variable node */
+ASTNode *createFloat(double value); /* Create float literal node */
 ASTNode *createBinOp(char op, ASTNode *left,
                      ASTNode *right); /* Create binary op node */
 ASTNode *createDecl(char *name);
@@ -165,6 +169,7 @@ ASTNode *createDecl(char *name);
                                                              declaration node
                                                            */
 ASTNode *createCharDecl(char *name);
+ASTNode *createFloatDecl(char *name);
 ASTNode *createAssign(char *var, ASTNode *value); /* Create assignment node */
 ASTNode *createPrint(ASTNode *expr);              /* Create print node */
 ASTNode *createStmtList(ASTNode *stmt1,

@@ -5,16 +5,23 @@ int add(int lhs, int rhs) {
   return sum;
 }
 
+int fortyTwo() {
+  return 42;
+}
+
 char echoChar(char input) {
   return input;
 }
 
 void main() {
   int total;
-  char ch;
+  int nested;
 
   total = add(7, 5);
   print(total);
+
+  nested = add(add(1, 2), fortyTwo());
+  print(nested);
 
   print(echoChar('z'));
 }

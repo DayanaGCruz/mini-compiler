@@ -62,13 +62,15 @@ extern int yydebug;
     YYUNDEF = 257,                 /* "invalid token"  */
     LITERAL_NUM = 258,             /* LITERAL_NUM  */
     LITERAL_CHAR = 259,            /* LITERAL_CHAR  */
-    ID = 260,                      /* ID  */
-    KW_INT = 261,                  /* KW_INT  */
-    KW_PRINT = 262,                /* KW_PRINT  */
-    KW_CHAR = 263,                 /* KW_CHAR  */
-    KW_STRUCT = 264,               /* KW_STRUCT  */
-    KW_VOID = 265,                 /* KW_VOID  */
-    KW_RETURN = 266                /* KW_RETURN  */
+    LITERAL_FLOAT = 260,           /* LITERAL_FLOAT  */
+    ID = 261,                      /* ID  */
+    KW_INT = 262,                  /* KW_INT  */
+    KW_PRINT = 263,                /* KW_PRINT  */
+    KW_CHAR = 264,                 /* KW_CHAR  */
+    KW_FLOAT = 265,                /* KW_FLOAT  */
+    KW_STRUCT = 266,               /* KW_STRUCT  */
+    KW_VOID = 267,                 /* KW_VOID  */
+    KW_RETURN = 268                /* KW_RETURN  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -80,11 +82,12 @@ union YYSTYPE
 #line 33 "parser.y"
 
     int num;                /* For integer literals & char literal codepoints */
+    double fnum;            /* For floating-point literals */
     char* str;              /* For identifiers */
     struct ASTNode* node;   /* For AST nodes */
     DataType dataType;      /* For data type flag on identifiers and arrays */ 
 
-#line 88 "parser.tab.h"
+#line 91 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

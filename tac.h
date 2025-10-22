@@ -13,6 +13,8 @@
 typedef enum {
   TAC_ADD,    /* Addition: result = arg1 + arg2 */
   TAC_SUB,    /* Subtraction: result = arg1 - arg2 */
+  TAC_MUL,    /* Multiplication: result = arg1 * arg2 */
+  TAC_DIV,    /* Division: result = arg1 / arg2 */
   TAC_ASSIGN, /* Assignment: result = arg1 */
   TAC_PRINT,  /* Print: print(arg1) */
   TAC_DECL,   /* Declaration: declare result */
@@ -40,6 +42,9 @@ typedef struct TACInstr {
   char *arg1;            /* First operand (if needed) */
   char *arg2;            /* Second operand (for binary ops) */
   char *result;          /* Result/destination */
+  DataType resultType;   /* Type of the result operand */
+  DataType arg1Type;     /* Type info for arg1 */
+  DataType arg2Type;     /* Type info for arg2 */
   int paramCount; /* For CALL Instr */
   struct TACInstr *next; /* Linked list pointer */
 } TACInstr;
@@ -64,5 +69,8 @@ char *generateTACExpr(ASTNode *node); /* Generate TAC for expression */
 void printTAC();          /* Display unoptimized TAC */
 void optimizeTAC();       /* Apply optimizations */
 void printOptimizedTAC(); /* Display optimized TAC */
+
+TACList *getTACList();
+TACList *getOptimizedTACList();
 
 #endif

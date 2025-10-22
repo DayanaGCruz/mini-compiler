@@ -13,6 +13,8 @@ static const char *dataTypeToString(DataType type) {
     return "int";
   case TYPE_CHAR:
     return "char";
+  case TYPE_FLOAT:
+    return "float";
   case TYPE_VOID:
     return "void";
   default:
@@ -25,6 +27,13 @@ ASTNode *createNum(int value) {
   ASTNode *node = malloc(sizeof(ASTNode));
   node->type = NODE_NUM;
   node->data.num = value; /* Store the integer value */
+  return node;
+}
+
+ASTNode *createFloat(double value) {
+  ASTNode *node = malloc(sizeof(ASTNode));
+  node->type = NODE_FLOAT;
+  node->data.fnum = value;
   return node;
 }
 
@@ -57,6 +66,13 @@ ASTNode *createDecl(char *name) {
 ASTNode *createCharDecl(char *name) {
   ASTNode *node = malloc(sizeof(ASTNode));
   node->type = NODE_CHAR_DECL;
+  node->data.name = strdup(name);
+  return node;
+}
+
+ASTNode *createFloatDecl(char *name) {
+  ASTNode *node = malloc(sizeof(ASTNode));
+  node->type = NODE_FLOAT_DECL;
   node->data.name = strdup(name);
   return node;
 }
@@ -246,6 +262,9 @@ void printAST(ASTNode *node, int level) {
   case NODE_NUM:
     printf("NUM: %d\n", node->data.num);
     break;
+  case NODE_FLOAT:
+    printf("FLOAT: %f\n", node->data.fnum);
+    break;
   case NODE_VAR:
     printf("VAR: %s\n", node->data.name);
     break;
@@ -259,6 +278,9 @@ void printAST(ASTNode *node, int level) {
     break;
   case NODE_CHAR_DECL:
     printf("CHAR DECL: %s\n", node->data.name);
+    break;
+  case NODE_FLOAT_DECL:
+    printf("FLOAT DECL: %s\n", node->data.name);
     break;
   case NODE_ASSIGN:
     printf("ASSIGN: %s\n", node->data.assign.var);
@@ -295,7 +317,7 @@ void printAST(ASTNode *node, int level) {
     break;
   case NODE_STRUCT_FIELD:
     printf("%*sFIELD (%s): %s\n", level * 2, "",
-           node->data.struct_field.dataType == TYPE_CHAR ? "char" : "int",
+           dataTypeToString(node->data.struct_field.dataType),
            node->data.struct_field.fieldName);
     printAST(node->data.struct_field.next, level);
     break;

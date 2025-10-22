@@ -29,10 +29,11 @@ extern YYLTYPE yylloc;
 
 %%
 
-"int"           { printf("Found KW_INT\n"); return KW_INT; }
+"int"           { return KW_INT; }
 "print"         { return KW_PRINT; }
 
 "char"          { return KW_CHAR; }
+"float"         { return KW_FLOAT; }
 
 "struct"        { return KW_STRUCT; }
 
@@ -40,7 +41,6 @@ extern YYLTYPE yylloc;
 "void"          { return KW_VOID; }
 
 [a-zA-Z_][a-zA-Z0-9_]* { 
-    printf("Found ID\n");
     yylval.str = strdup(yytext);
     noteKeywordCandidate(yytext, yylineno);
     return ID; 
@@ -50,6 +50,16 @@ extern YYLTYPE yylloc;
     reportLexicalError(yylineno,
                        "illegal identifier '%s' (identifiers must start with a letter or underscore)",
                        yytext);
+}
+
+[0-9]+\.[0-9]*([eE][+-]?[0-9]+)? { 
+    yylval.fnum = atof(yytext);
+    return LITERAL_FLOAT;
+}
+
+[0-9]*\.[0-9]+([eE][+-]?[0-9]+)? {
+    yylval.fnum = atof(yytext);
+    return LITERAL_FLOAT;
 }
 
 [0-9]+          { 
@@ -80,6 +90,8 @@ extern YYLTYPE yylloc;
 
 "+"             { return '+'; }
 "-"             { return '-'; }
+"*"             { return '*'; }
+"/"             { return '/'; }
 "="             { return '='; }
 ";"             { return ';'; }
 "("             { return '('; }

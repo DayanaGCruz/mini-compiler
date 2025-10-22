@@ -42,6 +42,7 @@ static void freeSymbol(Symbol *sym) {
   sym->isArray = 0;
   sym->arraySize = 0;
   sym->isChar = 0;
+  sym->isFloat = 0;
   sym->isStruct = 0;
 }
 
@@ -56,6 +57,8 @@ static const char *dataTypeToString(DataType type) {
     return "char";
   case TYPE_INT:
     return "int";
+  case TYPE_FLOAT:
+    return "float";
   default:
     return "unknown";
   }
@@ -89,6 +92,7 @@ int addVar(char *name) {
   symtab.vars[symtab.count].isArray = 0;
   symtab.vars[symtab.count].arraySize = 0;
   symtab.vars[symtab.count].isChar = 0;
+  symtab.vars[symtab.count].isFloat = 0;
   symtab.vars[symtab.count].isStruct = 0;
   symtab.vars[symtab.count].structType = NULL;
 
@@ -127,6 +131,7 @@ int addCharVar(char *name) {
   symtab.vars[symtab.count].isArray = 0;
   symtab.vars[symtab.count].arraySize = 0;
   symtab.vars[symtab.count].isChar = 1;
+  symtab.vars[symtab.count].isFloat = 0;
   symtab.vars[symtab.count].isStruct = 0;
   symtab.vars[symtab.count].structType = NULL;
 
@@ -151,6 +156,7 @@ int addCharArrayVar(char *name, int size) {
   symtab.vars[symtab.count].isArray = 1;
   symtab.vars[symtab.count].offset = symtab.nextOffset;
   symtab.vars[symtab.count].isChar = 1;
+  symtab.vars[symtab.count].isFloat = 0;
   symtab.vars[symtab.count].isStruct = 0;
   symtab.vars[symtab.count].structType = NULL;
 
@@ -158,6 +164,33 @@ int addCharArrayVar(char *name, int size) {
   symtab.count++;
 
   printf("SYMBOL TABLE: Added char array '%s[%d]' at offset %d\n", name, size,
+         symtab.vars[symtab.count - 1].offset);
+  printSymTab();
+
+  return symtab.vars[symtab.count - 1].offset;
+}
+
+int addFloatVar(char *name) {
+  if (isVarDeclared(name)) {
+    printf("SYMBOL TABLE: Failed to add float '%s' - already declared\n", name);
+    return -1;
+  }
+
+  symtab.nextOffset = alignUp(symtab.nextOffset, 4);
+
+  symtab.vars[symtab.count].name = strdup(name);
+  symtab.vars[symtab.count].offset = symtab.nextOffset;
+  symtab.vars[symtab.count].isArray = 0;
+  symtab.vars[symtab.count].arraySize = 0;
+  symtab.vars[symtab.count].isChar = 0;
+  symtab.vars[symtab.count].isFloat = 1;
+  symtab.vars[symtab.count].isStruct = 0;
+  symtab.vars[symtab.count].structType = NULL;
+
+  symtab.nextOffset += 4;
+  symtab.count++;
+
+  printf("SYMBOL TABLE: Added float '%s' at offset %d\n", name,
          symtab.vars[symtab.count - 1].offset);
   printSymTab();
 
@@ -177,6 +210,7 @@ int addArrayVar(char *name, int size) {
   symtab.vars[symtab.count].isArray = 1;
   symtab.vars[symtab.count].offset = symtab.nextOffset;
   symtab.vars[symtab.count].isChar = 0;
+  symtab.vars[symtab.count].isFloat = 0;
   symtab.vars[symtab.count].isStruct = 0;
   symtab.vars[symtab.count].structType = NULL;
 
@@ -184,6 +218,34 @@ int addArrayVar(char *name, int size) {
   symtab.count++;
 
   printf("SYMBOL TABLE: Added array '%s[%d]' at offset %d\n", name, size,
+         symtab.vars[symtab.count - 1].offset);
+  printSymTab();
+
+  return symtab.vars[symtab.count - 1].offset;
+}
+
+int addFloatArrayVar(char *name, int size) {
+  if (isVarDeclared(name)) {
+    printf("SYMBOL TABLE: Failed to add float array '%s' - already declared\n",
+           name);
+    return -1;
+  }
+
+  symtab.nextOffset = alignUp(symtab.nextOffset, 4);
+
+  symtab.vars[symtab.count].name = strdup(name);
+  symtab.vars[symtab.count].arraySize = size;
+  symtab.vars[symtab.count].isArray = 1;
+  symtab.vars[symtab.count].offset = symtab.nextOffset;
+  symtab.vars[symtab.count].isChar = 0;
+  symtab.vars[symtab.count].isFloat = 1;
+  symtab.vars[symtab.count].isStruct = 0;
+  symtab.vars[symtab.count].structType = NULL;
+
+  symtab.nextOffset += size * 4;
+  symtab.count++;
+
+  printf("SYMBOL TABLE: Added float array '%s[%d]' at offset %d\n", name, size,
          symtab.vars[symtab.count - 1].offset);
   printSymTab();
 
@@ -206,6 +268,30 @@ int isCharVar(char *name) {
     }
   }
   return 0; /* Not found or not a char */
+}
+
+int isFloatVar(char *name) {
+  for (int i = 0; i < symtab.count; i++) {
+    if (strcmp(symtab.vars[i].name, name) == 0) {
+      return symtab.vars[i].isFloat;
+    }
+  }
+  return 0;
+}
+
+DataType getVarType(const char *name) {
+  for (int i = 0; i < symtab.count; i++) {
+    if (strcmp(symtab.vars[i].name, name) == 0) {
+      if (symtab.vars[i].isChar)
+        return TYPE_CHAR;
+      if (symtab.vars[i].isFloat)
+        return TYPE_FLOAT;
+      if (symtab.vars[i].isStruct)
+        return TYPE_VOID;
+      return TYPE_INT;
+    }
+  }
+  return TYPE_INT;
 }
 
 int getArraySize(char *name) {
@@ -273,7 +359,7 @@ int addStructField(char *structName, char *fieldName, DataType type) {
   StructField *field = &def->fields[def->fieldCount];
   field->name = strdup(fieldName);
   field->type = type;
-  if (type == TYPE_INT) {
+  if (type == TYPE_INT || type == TYPE_FLOAT) {
     def->size = alignUp(def->size, 4);
   }
   field->offset = def->size;
@@ -307,6 +393,7 @@ int addStructVar(char *varName, const char *structName) {
   symtab.vars[symtab.count].isArray = 0;
   symtab.vars[symtab.count].arraySize = 0;
   symtab.vars[symtab.count].isChar = 0;
+  symtab.vars[symtab.count].isFloat = 0;
   symtab.vars[symtab.count].isStruct = 1;
   symtab.vars[symtab.count].structType = strdup(structName);
 
@@ -398,14 +485,24 @@ void printSymTab() {
     for (int i = 0; i < symtab.count; i++) {
       Symbol *sym = &symtab.vars[i];
       if (sym->isArray) {
+        const char *label = "int";
+        if (sym->isChar)
+          label = "char";
+        else if (sym->isFloat)
+          label = "float";
         printf(" [%d] %s[%d] -> offset %d (%s array)\n", i, sym->name,
-               sym->arraySize, sym->offset, sym->isChar ? "char" : "int");
+               sym->arraySize, sym->offset, label);
       } else if (sym->isStruct) {
         printf(" [%d] %s -> offset %d (struct %s)\n", i, sym->name, sym->offset,
                sym->structType);
       } else {
+        const char *label = "int";
+        if (sym->isChar)
+          label = "char";
+        else if (sym->isFloat)
+          label = "float";
         printf(" [%d] %s -> offset %d (%s)\n", i, sym->name, sym->offset,
-               sym->isChar ? "char" : "int");
+               label);
       }
     }
   }

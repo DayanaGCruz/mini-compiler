@@ -45,9 +45,13 @@ clean:
 	rm -f $(TARGET) $(OBJS) lex.yy.c parser.tab.c parser.tab.h *.s
 
 test: $(TARGET)
-	./$(TARGET) source.cm output.s
-	@echo "=== Generated MIPS Code ==="
-	@cat output.s
-	@echo "=== Running in SPIM ==="
-	@spim output.s
+	@for src in tests/*.cm; do \
+		out=$${src%.cm}.s; \
+		echo "=== Compiling $$src ==="; \
+		./$(TARGET) $$src $$out; \
+		echo "=== Generated MIPS Code ($$out) ==="; \
+		cat $$out; \
+		echo "=== Running in SPIM ==="; \
+		spim $$out; \
+	done
 .PHONY: all clean test

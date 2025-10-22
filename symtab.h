@@ -20,6 +20,7 @@ typedef struct {
   int isArray;
   int arraySize;
   int isChar;        /* 1 if char, else 0 (int)*/
+  int isFloat;       /* 1 if float */
   int isStruct;      /* 1 if struct variable */
   char *structType;  /* Struct type name if applicable */
   int isFunction;    /* 1 if function, 0 if variable */
@@ -67,12 +68,16 @@ void initStructTable();
 int addVar(
     char *name); /* Add new variable, returns offset or -1 if duplicate */
 int addCharVar(char *name);
+int addFloatVar(char *name);
 int getVarOffset(
     char *name); /* Get stack offset for variable, -1 if not found */
 int isCharVar(char *name);
+int isFloatVar(char *name);
+DataType getVarType(const char *name);
 int isVarDeclared(char *name); /* Check if variable exists (1=yes, 0=no) */
 int addCharArrayVar(char *name, int size);
 int addArrayVar(char *name, int size); /*Add array to symbol table*/
+int addFloatArrayVar(char *name, int size);
 int isArrayVar(char *name);            /* Check if variable is an array*/
 int getArraySize(char *name);
 int addStructType(char *name);

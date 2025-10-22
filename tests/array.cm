@@ -1,16 +1,14 @@
 void main() {
-  int x;
-  int y;
-  int z;
+  int values[3];
+  int idx;
 
-  x = 10;
-  y = 20;
-  z = x + y;
-  print(z);
+  values[0] = 4;
+  values[1] = 5;
+  idx = 2;
 
-  x = z + 5;
-  print(x);
+  values[idx] = values[0] + values[1];
+  print(values[idx]);
 
-  y = x + y + z;
-  print(y);
+  values[0] = values[idx] - 3;
+  print(values[0]);
 }

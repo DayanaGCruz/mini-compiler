@@ -2,10 +2,9 @@
 
 .text
 .globl main
-main:
-    # Allocate stack space
-    addi $sp, $sp, -400
 
+main:
+    addi $sp, $sp, -400
     # Struct Point defined
     # Declared struct Point p at offset 0
     # Declared total at offset 12
@@ -35,16 +34,16 @@ main:
     syscall
     # Struct access: p.tag
     lb $t0, 8($sp)
-     # Print character
-     li $v0, 11
-     move $a0, $t0
-     syscall
+    # Print character
+    li $v0, 11
+    move $a0, $t0
+    syscall
     # Print newline
     li $v0, 11
     li $a0, 10
     syscall
-
-    # Exit program
+__return_main:
     addi $sp, $sp, 400
     li $v0, 10
     syscall
+
