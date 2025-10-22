@@ -7,7 +7,7 @@
 #include <string.h>
 
 #define LOCAL_STACK_SIZE 400
-#define RA_SAVE_OFFSET LOCAL_STACK_SIZE
+#define RA_SAVE_OFFSET (LOCAL_STACK_SIZE - 4)
 
 typedef struct {
   char name[64];

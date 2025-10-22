@@ -44,7 +44,7 @@ ASTNode* root = NULL;          /* Root of the Abstract Syntax Tree */
 
 /* Number token carries an integer value */
 %token <str> ID         /* Identifier token carries a string */
-%token KW_INT KW_PRINT KW_CHAR KW_FLOAT KW_STRUCT KW_VOID KW_RETURN     /* Keywords have no semantic value */
+%token KW_INT KW_PRINT KW_CHAR KW_FLOAT KW_STRUCT KW_VOID KW_RETURN KW_IF KW_ELSE KW_GOTO KW_CONTINUE   /* Keywords have no semantic value */
 
 /* NON-TERMINAL TYPES - Define what type each grammar rule returns */
 %type <node> program stmt_list stmt decl assign expr print_stmt struct_decl

@@ -40,6 +40,11 @@ extern YYLTYPE yylloc;
 "return"        { return KW_RETURN; }
 "void"          { return KW_VOID; }
 
+"if"            { return KW_IF; }
+"else"          { return KW_ELSE; }
+"goto"          { return KW_GOTO; }
+"continue"      { return KW_CONTINUE; } 
+
 [a-zA-Z_][a-zA-Z0-9_]* { 
     yylval.str = strdup(yytext);
     noteKeywordCandidate(yytext, yylineno);
@@ -102,6 +107,13 @@ extern YYLTYPE yylloc;
 "}"             { return '}'; }
 "."             { return '.'; }
 ","             { return ','; }
+
+">"             { return '>'; }
+"<"             { return '<'; }
+">="            { return '>='; }
+"<="            { return '<='; }
+"=="            { return '=='; }
+"!="            { return '!='; }
 
 [ \t\r]+       { }
 
