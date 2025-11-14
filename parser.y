@@ -45,7 +45,7 @@ ASTNode* root = NULL;          /* Root of the Abstract Syntax Tree */
 /* Number token carries an integer value */
 %token <str> ID         /* Identifier token carries a string */
 %token KW_INT KW_PRINT KW_CHAR KW_FLOAT KW_BOOL KW_STRUCT KW_VOID KW_RETURN
-%token KW_IF KW_ELSE KW_SWITCH KW_CASE KW_DEFAULT KW_BREAK KW_GOTO KW_CONTINUE
+%token KW_IF KW_ELSE KW_SWITCH KW_CASE KW_DEFAULT KW_BREAK KW_GOTO KW_CONTINUE KW_WHILE
 %token KW_TRUE KW_FALSE
 %token AND OR NOT EQ NEQ LEQ GEQ   /* Multi-character operators */
 
@@ -54,7 +54,7 @@ ASTNode* root = NULL;          /* Root of the Abstract Syntax Tree */
               struct_field_list struct_field struct_var_decl struct_assign 
               arg_list return_stmt expr_stmt param param_list func_decl func_list
               func_item block if_stmt switch_stmt switch_case_list switch_item
-              case_stmt_body
+              case_stmt_body while_stmt
 %type <dataType> type
 
 /* OPERATOR PRECEDENCE AND ASSOCIATIVITY */
@@ -158,6 +158,7 @@ stmt:
     | switch_stmt
     | block
     | KW_BREAK ';' { $$ = createBreak(); }
+    | while_stmt
     ;
 
 block:
@@ -170,7 +171,6 @@ if_stmt:
     | KW_IF '(' expr ')' block KW_ELSE block { $$ = createIf($3, $5, $7); }
     | KW_IF '(' expr ')' block KW_ELSE if_stmt { $$ = createIf($3, $5, $7); }
     ;
-
 
 switch_stmt:
     KW_SWITCH '(' expr ')' '{' '}' {
@@ -204,6 +204,11 @@ case_stmt_body:
     | /* empty */ { $$ = NULL; }
     ;
 
+while_stmt:
+    KW_WHILE '(' expr ')' block {
+      $$ = createWhile($3, $5);
+    }
+    ;
 expr_stmt:
     expr ';' { $$ = createExprStmt($1); }
     ;

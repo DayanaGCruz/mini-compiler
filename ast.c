@@ -374,6 +374,14 @@ ASTNode *createConditionalExpr(ASTNode *cond, ASTNode *trueExpr,
   return node;
 }
 
+ASTNode *createWhile(ASTNode *cond, ASTNode *body) {
+  ASTNode *node = allocNode(NODE_WHILE);
+  node->data.while_stmt.condition = cond;
+  node->data.while_stmt.body = body;
+  return node;
+}
+
+
 static void printIndent(int level) {
   for (int i = 0; i < level; i++)
     printf("  ");
@@ -600,6 +608,12 @@ void printAST(ASTNode *node, int level) {
     printIndent(level);
     printf("RETURN\n");
     printAST(node->data.return_expr, level + 1);
+    break;
+  case NODE_WHILE:
+      printIndent(level);
+      printf("WHILE\n");
+      printAST(node->data.while_stmt.condition, level + 1);
+      printAST(node->data.while_stmt.body, level + 1);
     break;
   default:
     break;

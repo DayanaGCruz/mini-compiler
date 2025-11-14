@@ -80,16 +80,17 @@ extern int yydebug;
     KW_BREAK = 275,                /* KW_BREAK  */
     KW_GOTO = 276,                 /* KW_GOTO  */
     KW_CONTINUE = 277,             /* KW_CONTINUE  */
-    KW_TRUE = 278,                 /* KW_TRUE  */
-    KW_FALSE = 279,                /* KW_FALSE  */
-    AND = 280,                     /* AND  */
-    OR = 281,                      /* OR  */
-    NOT = 282,                     /* NOT  */
-    EQ = 283,                      /* EQ  */
-    NEQ = 284,                     /* NEQ  */
-    LEQ = 285,                     /* LEQ  */
-    GEQ = 286,                     /* GEQ  */
-    LOWER_THAN_ELSE = 287          /* LOWER_THAN_ELSE  */
+    KW_WHILE = 278,                /* KW_WHILE  */
+    KW_TRUE = 279,                 /* KW_TRUE  */
+    KW_FALSE = 280,                /* KW_FALSE  */
+    AND = 281,                     /* AND  */
+    OR = 282,                      /* OR  */
+    NOT = 283,                     /* NOT  */
+    EQ = 284,                      /* EQ  */
+    NEQ = 285,                     /* NEQ  */
+    LEQ = 286,                     /* LEQ  */
+    GEQ = 287,                     /* GEQ  */
+    LOWER_THAN_ELSE = 288          /* LOWER_THAN_ELSE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -106,7 +107,7 @@ union YYSTYPE
     struct ASTNode* node;   /* For AST nodes */
     DataType dataType;      /* For data type flag on identifiers and arrays */ 
 
-#line 110 "parser.tab.h"
+#line 111 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

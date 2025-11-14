@@ -69,7 +69,8 @@ typedef enum {
   NODE_PARAM_LIST,
   NODE_ARG_LIST,
   NODE_RETURN,
-  NODE_FUNC_LIST
+  NODE_FUNC_LIST,
+  NODE_WHILE
 } NodeType;
 
 typedef struct ASTNode {
@@ -204,6 +205,12 @@ typedef struct ASTNode {
       struct ASTNode *next;
       char *label;
     } case_stmt;
+
+    struct {
+      struct ASTNode *condition;
+      struct ASTNode *body;
+    } while_stmt;
+
   } data;
 } ASTNode;
 
@@ -243,6 +250,7 @@ ASTNode *createParamList(ASTNode *param, ASTNode *next);
 ASTNode *createArgList(ASTNode *arg, ASTNode *next);
 ASTNode *createReturn(ASTNode *expr);
 ASTNode *createFuncList(ASTNode *func, ASTNode *next);
+
 ASTNode *createIf(ASTNode *cond, ASTNode *thenBranch, ASTNode *elseBranch);
 ASTNode *createSwitch(ASTNode *expr, ASTNode *cases, ASTNode *defaultCase);
 ASTNode *createCase(ASTNode *valueExpr, ASTNode *statements);
@@ -251,6 +259,8 @@ ASTNode *appendCase(ASTNode *cases, ASTNode *newCase);
 ASTNode *createBreak(void);
 ASTNode *createConditionalExpr(ASTNode *cond, ASTNode *trueExpr,
                                ASTNode *falseExpr);
+
+ASTNode *createWhile(ASTNode *cond, ASTNode *body);
 
 void printAST(ASTNode *node, int level);
 

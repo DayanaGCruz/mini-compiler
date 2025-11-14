@@ -136,8 +136,8 @@ static void recordStructVar(const char *varName, const char *structType) {
     }
   }
 
-  if (structVarCount < (int)(sizeof(structVarTable) /
-                             sizeof(structVarTable[0]))) {
+  if (structVarCount <
+      (int)(sizeof(structVarTable) / sizeof(structVarTable[0]))) {
     structVarTable[structVarCount].varName = strdup(varName);
     structVarTable[structVarCount].structType = strdup(structType);
     structVarCount++;
@@ -177,7 +177,8 @@ static void recordArrayInfo(const char *name, int size) {
     }
   }
 
-  if (arrayInfoCount < (int)(sizeof(arrayInfoTable) / sizeof(arrayInfoTable[0]))) {
+  if (arrayInfoCount <
+      (int)(sizeof(arrayInfoTable) / sizeof(arrayInfoTable[0]))) {
     arrayInfoTable[arrayInfoCount].name = strdup(name);
     arrayInfoTable[arrayInfoCount].size = size;
     arrayInfoCount++;
@@ -278,7 +279,8 @@ static int evalConstInt(ASTNode *node, int *value) {
   }
 }
 
-static void validateArrayIndex(const char *arrayName, ASTNode *indexNode, int line) {
+static void validateArrayIndex(const char *arrayName, ASTNode *indexNode,
+                               int line) {
   if (!arrayName || !indexNode)
     return;
 
@@ -329,7 +331,7 @@ static const char *lookupStructVarType(const char *varName) {
 }
 
 static int structFieldExists(const char *structName, const char *fieldName,
-                                        DataType *typeOut) {
+                             DataType *typeOut) {
   if (!structName || !fieldName)
     return 0;
 
@@ -442,8 +444,8 @@ static void warnTypeCoercion(DataType fromType, DataType toType,
   if (fromType == toType)
     return;
 
-  reportTypeMismatchWarning(0, typeToString(fromType),
-                            typeToString(toType), context);
+  reportTypeMismatchWarning(0, typeToString(fromType), typeToString(toType),
+                            context);
 }
 
 static void registerParamTypes(ASTNode *params) {
@@ -454,15 +456,13 @@ static void registerParamTypes(ASTNode *params) {
   case NODE_PARAM:
     if (params->data.param.isStruct) {
       if (params->data.param.structType) {
-        recordStructVar(params->data.param.name,
-                        params->data.param.structType);
+        recordStructVar(params->data.param.name, params->data.param.structType);
       }
       recordNameType(params->data.param.name, TYPE_VOID);
     } else {
       recordNameType(params->data.param.name, params->data.param.type);
       if (params->data.param.isArray) {
-        recordArrayInfo(params->data.param.name,
-                        params->data.param.arraySize);
+        recordArrayInfo(params->data.param.name, params->data.param.arraySize);
       }
     }
     break;
@@ -540,9 +540,7 @@ static int isComparisonOp(BinaryOp op) {
   }
 }
 
-static int isLogicalOp(BinaryOp op) {
-  return op == OP_AND || op == OP_OR;
-}
+static int isLogicalOp(BinaryOp op) { return op == OP_AND || op == OP_OR; }
 
 static DataType inferNodeType(ASTNode *node) {
   if (!node)
@@ -586,10 +584,12 @@ static DataType inferNodeType(ASTNode *node) {
   case NODE_FUNC_CALL:
     return lookupFunctionReturn(node->data.func_call.name);
   case NODE_STRUCT_ACCESS: {
-    const char *structType = lookupStructVarType(node->data.struct_access.varName);
+    const char *structType =
+        lookupStructVarType(node->data.struct_access.varName);
     if (!structType)
       return TYPE_INT;
-    return lookupStructFieldType(structType, node->data.struct_access.fieldName);
+    return lookupStructFieldType(structType,
+                                 node->data.struct_access.fieldName);
   }
   case NODE_EXPR_STMT:
     return inferNodeType(node->data.expr);
@@ -1068,15 +1068,13 @@ char *generateTACExpr(ASTNode *node) {
 
     if (leftType != exprType) {
       char detail[128];
-      snprintf(detail, sizeof(detail),
-               "in '%s' expression (left operand)",
+      snprintf(detail, sizeof(detail), "in '%s' expression (left operand)",
                binaryOpToString(op));
       warnTypeCoercion(leftType, exprType, detail);
     }
     if (rightType != exprType) {
       char detail[128];
-      snprintf(detail, sizeof(detail),
-               "in '%s' expression (right operand)",
+      snprintf(detail, sizeof(detail), "in '%s' expression (right operand)",
                binaryOpToString(op));
       warnTypeCoercion(rightType, exprType, detail);
     }
@@ -1115,8 +1113,8 @@ char *generateTACExpr(ASTNode *node) {
     char *temp = newTemp();
     recordNameType(temp, exprType);
 
-    TACInstr *instr = createTAC(
-        TAC_ARRAY_ACCESS, indexExpr, node->data.array_access.name, temp);
+    TACInstr *instr = createTAC(TAC_ARRAY_ACCESS, indexExpr,
+                                node->data.array_access.name, temp);
     instr->arg1Type = inferNodeType(node->data.array_access.index);
     instr->arg2Type = lookupNameType(node->data.array_access.name);
     instr->resultType = exprType;
@@ -1187,9 +1185,9 @@ char *generateTACExpr(ASTNode *node) {
     char *temp = newTemp();
     recordNameType(temp, exprType);
 
-    TACInstr *instr = createTAC(TAC_STRUCT_ACCESS,
-                                node->data.struct_access.varName,
-                                node->data.struct_access.fieldName, temp);
+    TACInstr *instr =
+        createTAC(TAC_STRUCT_ACCESS, node->data.struct_access.varName,
+                  node->data.struct_access.fieldName, temp);
     instr->arg2Type = fieldType;
     instr->resultType = exprType;
     instr->line = node->line;
@@ -1266,8 +1264,7 @@ void generateTAC(ASTNode *node) {
     }
     recordNameType(node->data.assign.var, targetType);
 
-    TACInstr *instr = createTAC(TAC_ASSIGN, expr, NULL,
-                                node->data.assign.var);
+    TACInstr *instr = createTAC(TAC_ASSIGN, expr, NULL, node->data.assign.var);
     instr->arg1Type = valueType;
     instr->resultType = targetType;
     appendTAC(instr);
@@ -1347,8 +1344,8 @@ void generateTAC(ASTNode *node) {
     char *elseLabel = elseBranch ? newLabel("if_else") : NULL;
     char *endLabel = newLabel("if_end");
 
-    TACInstr *branch = createTAC(TAC_IFZ, condValue, NULL,
-                                 elseBranch ? elseLabel : endLabel);
+    TACInstr *branch =
+        createTAC(TAC_IFZ, condValue, NULL, elseBranch ? elseLabel : endLabel);
     branch->arg1Type = condType;
     appendTAC(branch);
 
@@ -1471,9 +1468,9 @@ void generateTAC(ASTNode *node) {
     recordStructVar(node->data.struct_var_decl.varName,
                     node->data.struct_var_decl.structName);
     recordNameType(node->data.struct_var_decl.varName, TYPE_VOID);
-    TACInstr *instr = createTAC(TAC_STRUCT_VAR_DECL,
-                                node->data.struct_var_decl.structName, NULL,
-                                node->data.struct_var_decl.varName);
+    TACInstr *instr =
+        createTAC(TAC_STRUCT_VAR_DECL, node->data.struct_var_decl.structName,
+                  NULL, node->data.struct_var_decl.varName);
     instr->resultType = TYPE_VOID;
     appendTAC(instr);
     break;
@@ -1500,8 +1497,7 @@ void generateTAC(ASTNode *node) {
     DataType valueType = inferNodeType(node->data.struct_assign.value);
     if (valueType != fieldType) {
       char detail[128];
-      snprintf(detail, sizeof(detail),
-               "while assigning to field '%s.%s'",
+      snprintf(detail, sizeof(detail), "while assigning to field '%s.%s'",
                node->data.struct_assign.varName,
                node->data.struct_assign.fieldName);
       warnTypeCoercion(valueType, fieldType, detail);
@@ -1554,6 +1550,26 @@ void generateTAC(ASTNode *node) {
       appendTAC(instr);
     }
     break;
+  case NODE_WHILE: {
+    char *startLabel = newLabel("while_start");
+    char *endLabel = newLabel("while_end");
+
+    appendTAC(createTAC(TAC_LABEL, NULL, NULL, startLabel));
+
+    char *condTemp = generateTACExpr(node->data.while_stmt.condition);
+    TACInstr *exitBranch = createTAC(TAC_IFZ, condTemp, NULL, endLabel);
+    exitBranch->arg1Type = inferNodeType(node->data.while_stmt.condition);
+    appendTAC(exitBranch);
+
+    pushBreakLabel(endLabel);
+    generateTAC(node->data.while_stmt.body);
+    popBreakLabel();
+
+    appendTAC(createTAC(TAC_GOTO, NULL, NULL, startLabel));
+    appendTAC(createTAC(TAC_LABEL, NULL, NULL, endLabel));
+
+    break;
+  }
   default:
     break;
   }
@@ -1686,8 +1702,7 @@ void optimizeTAC() {
 
   int hasControlFlow = 0;
   for (TACInstr *scan = tacList.head; scan; scan = scan->next) {
-    if (scan->op == TAC_GOTO || scan->op == TAC_IFZ ||
-        scan->op == TAC_IFNZ) {
+    if (scan->op == TAC_GOTO || scan->op == TAC_IFZ || scan->op == TAC_IFNZ) {
       hasControlFlow = 1;
       break;
     }
@@ -1858,7 +1873,8 @@ void optimizeTAC() {
 
     case TAC_ARRAY_DECL:
       /* TODO: Arrays declarations don't need optimization */
-      newInstr = createTAC(TAC_ARRAY_DECL, curr->arg1, curr->arg2, curr->result);
+      newInstr =
+          createTAC(TAC_ARRAY_DECL, curr->arg1, curr->arg2, curr->result);
       copyTypeInfo(newInstr, curr);
       break;
 
@@ -2148,8 +2164,8 @@ void printFunctionReturnTable() {
   } else {
     for (int i = 0; i < functionReturnCount; ++i) {
       const char *name = functionReturnTable[i].name
-                              ? functionReturnTable[i].name
-                              : "<unnamed>";
+                             ? functionReturnTable[i].name
+                             : "<unnamed>";
       printf(" [%d] %s -> %s\n", i, name,
              typeToString(functionReturnTable[i].returnType));
     }

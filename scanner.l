@@ -54,6 +54,8 @@ extern YYLTYPE yylloc;
 "true"          { return KW_TRUE; }
 "false"         { return KW_FALSE; }
 
+"while"         { return KW_WHILE; }
+
 [a-zA-Z_][a-zA-Z0-9_]* { 
     yylval.str = strdup(yytext);
     noteKeywordCandidate(yytext, yylineno);
