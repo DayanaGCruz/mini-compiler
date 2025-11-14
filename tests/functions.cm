@@ -1,0 +1,27 @@
+int add(int lhs, int rhs) {
+  int sum;
+
+  sum = lhs + rhs;
+  return sum;
+}
+
+int fortyTwo() {
+  return 42;
+}
+
+void echoChar(char input) {
+  print(input);
+}
+
+void main() {
+  int total;
+  int nested;
+
+  total = add(7, 5);
+  print(total);
+
+  nested = add(add(1, 2), fortyTwo());
+  print(nested);
+  
+  echoChar('z');
+}

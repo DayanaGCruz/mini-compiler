@@ -1,0 +1,20 @@
+int duplicate(int value) {
+  int temp;
+  temp = value + 10;
+  return temp;
+}
+
+int duplicate_helper(int value) {
+  int temp;
+  temp = value * 2;
+  return temp;
+}
+
+void main() {
+  int temp;
+  temp = duplicate(5);
+  print(temp);
+  temp = duplicate_helper(5);
+  print(temp);
+}
+

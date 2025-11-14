@@ -1,0 +1,17 @@
+void main() {
+  float a;
+  float b;
+  float prod;
+  float ratio;
+  float mix;
+
+  a = 3.5;
+  b = 2.0;
+  prod = a * b;
+  ratio = a / b;
+  mix = prod + ratio - 1.5;
+
+  print(prod);
+  print(ratio);
+  print(mix);
+}

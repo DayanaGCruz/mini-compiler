@@ -1,0 +1,21 @@
+int sum_pair(int value, int delta) {
+    int working;
+    working = value + delta;
+    return working;
+}
+
+int diff_pair(int value, int delta) {
+    int working;
+    working = value - delta;
+    return working;
+}
+
+int main() {
+    int first;
+    int second;
+    first = sum_pair(10, 4);
+    second = diff_pair(10, 4);
+    print(first);
+    print(second);
+    return 0;
+}

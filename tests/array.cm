@@ -1,0 +1,14 @@
+void main() {
+  int values[3];
+  int idx;
+
+  values[0] = 4;
+  values[1] = 5;
+  idx = 2;
+
+  values[idx] = values[0] + values[1];
+  print(values[idx]);
+
+  values[0] = values[idx] - 3;
+  print(values[0]);
+}
