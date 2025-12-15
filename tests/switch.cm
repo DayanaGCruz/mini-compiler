@@ -1,0 +1,68 @@
+int classify(int value) {
+  switch (value) {
+    case 0:
+      return 100;
+    case 1:
+      return 200;
+    case 2:
+      return 300;
+    default:
+      return 999;
+  }
+}
+
+int main() {
+  int total;
+  int mode;
+
+  total = 0;
+  mode = 2;
+
+  switch (mode) {
+    case 1:
+      total = total + 10;
+      break;
+    case 2:
+      total = total + 20;
+    case 3:
+      total = total + 30;
+      break;
+    default:
+      total = total + 40;
+  }
+  print(total);
+
+  switch (5) {
+    case 7:
+      print(777);
+      break;
+    default:
+      print(888);
+  }
+
+  int nested;
+  nested = 3;
+  switch (nested - 1) {
+    case 1:
+      print(classify(0));
+      break;
+    case 2:
+      print(classify(1));
+      break;
+    default:
+      print(classify(5));
+  }
+
+  int noDefault;
+  noDefault = 1;
+  switch (noDefault) {
+    case 1:
+      print(444);
+      break;
+    case 2:
+      print(0);
+      break;
+  }
+
+  return 0;
+}

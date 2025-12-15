@@ -1,0 +1,25 @@
+float scaleAndShift(int base, float scale) {
+  float result;
+  result = base * scale;
+  return result;
+}
+
+void main() {
+  int numbers[2];
+  float computed;
+  struct Pair {
+    int first;
+    char mark;
+  };
+  struct Pair p;
+
+  numbers[0] = 3;
+  numbers[1] = 4;
+  computed = scaleAndShift(numbers[0] + numbers[1], 1.5);
+  print(computed);
+
+  p.first = numbers[0] * numbers[1];
+  p.mark = 'B';
+  print(p.first);
+  print(p.mark);
+}

@@ -1,0 +1,10 @@
+/*
+ * Compile-time division-by-zero error: the denominator is a literal 0,
+ * so the semantic checker should reject this program.
+ */
+int main() {
+    int value;
+    value = 1234 / 0;
+    print(value);
+    return 0;
+}

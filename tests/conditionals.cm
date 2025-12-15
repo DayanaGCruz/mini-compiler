@@ -1,0 +1,51 @@
+int main() {
+  bool ready;
+  bool skip;
+  int result;
+
+  ready = true;
+  skip = false;
+  result = 0;
+
+  if (ready) {
+    result = result + 1;
+    if (!skip && result == 1) {
+      print(result);
+    } else {
+      print(99);
+    }
+  } else {
+    print(1000);
+  }
+
+  int value;
+  value = 4;
+
+  if (value > 5) {
+    print(200);
+  } else if (value > 3) {
+    print(300);
+  } else {
+    print(400);
+  }
+
+  int ternaryA;
+  int ternaryB;
+  ternaryA = ready ? 7 : 8;
+  ternaryB = (value < 0) ? 9 : (skip ? 10 : 11);
+  print(ternaryA);
+  print(ternaryB);
+
+  bool nestedFlag;
+  nestedFlag = false;
+
+  if (ready) {
+    if (nestedFlag) {
+      print(500);
+    } else {
+      print(600);
+    }
+  }
+
+  return 0;
+}

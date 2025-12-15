@@ -1,0 +1,22 @@
+int add(int a, int b) {
+  return a + b;
+}
+
+int sub(int a) {
+  return a;
+}
+
+int call_with_too_few() {
+  return add(1); // missing argument
+}
+
+int call_with_too_many() {
+  return sub(1, 2); // extra argument
+}
+
+
+int main() {
+  int a;
+  a = sub(4,5);
+  return call_with_too_few() + call_with_too_many();
+}

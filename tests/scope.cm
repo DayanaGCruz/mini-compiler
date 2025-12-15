@@ -1,0 +1,18 @@
+int compute(int input) {
+  int shadow;
+
+  shadow = input * 2;
+  return shadow;
+}
+
+void main() {
+  int shadow;
+  int result;
+
+  shadow = 21;
+  result = compute(3);
+
+  print(shadow);
+  print(result);
+}
+

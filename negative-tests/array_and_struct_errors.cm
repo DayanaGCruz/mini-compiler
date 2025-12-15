@@ -1,0 +1,11 @@
+int main() {
+  struct Point {
+    int x;
+    int y;
+  };
+  struct Point p;
+  int arr[3];
+  arr[3] = 10;
+  p.z = 5;
+  return 0;
+}

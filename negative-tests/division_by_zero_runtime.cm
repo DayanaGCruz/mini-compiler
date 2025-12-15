@@ -1,0 +1,15 @@
+/*
+ * Negative test: emit a divide-by-zero at runtime.
+ * Run with input 0 to trigger the runtime guard.
+ */
+int main() {
+    int numerator;
+    int denominator;
+    int result;
+
+    numerator = 1234;
+    denominator = input();
+    result = numerator / denominator;
+    print(result);
+    return 0;
+}

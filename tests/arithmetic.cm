@@ -1,0 +1,19 @@
+void main() {
+  int a;
+  int b;
+  int c;
+
+  a = 10;
+  b = 3;
+  c = a - b;
+  print(c);
+
+  c = a + b - 2;
+  print(c);
+
+  c = a - b - 2;
+  print(c);
+
+  c = 5 - (a - b);
+  print(c);
+}
